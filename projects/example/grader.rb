@@ -14,6 +14,7 @@ def grade_assignment(possible_submission_folders, submission_name)
         # 
         # run the command
         # 
+        command_result = nil
         FileSystem.in_dir(each_folder) do
             command_result = Console.run!(["python", each_folder/"autograder.py"])
         end
@@ -37,7 +38,7 @@ def grade_assignment(possible_submission_folders, submission_name)
             "uin" => uin,
             "grade" => total,
             "folder" => each_folder,
-            "autograder_output" => output,
+            "autograder_output" => output.gsub(/\t/,"    "),
         })
     end
     return results

@@ -2,4 +2,4 @@
 
 # source all the file in settings/during_clean/ in alphabetical order
 cd "$FORNIX_FOLDER"
-ruby ./tools/grade_all "$@"
+ruby ./tools/grade_all.rb "$@"

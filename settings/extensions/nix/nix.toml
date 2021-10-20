@@ -44,6 +44,9 @@
 # 
 
 [[packages]]
+load = [ "ruby",]
+
+[[packages]]
 load = [ "python38",]
 from = "3f50332bc4913a56ad216ca01f5d0bd24277a6b2"
 
@@ -61,6 +64,10 @@ from = "3f50332bc4913a56ad216ca01f5d0bd24277a6b2"
 
 [[packages]]
 load = [ "python38Packages", "wheel",]
+from = "3f50332bc4913a56ad216ca01f5d0bd24277a6b2"
+
+[[packages]]
+load = [ "python38Packages", "tkinter",]
 from = "3f50332bc4913a56ad216ca01f5d0bd24277a6b2"
 
 [[packages]]
@@ -180,36 +187,6 @@ load = [ "libkrb5",]
 # 
 
 [[packages]]
-load = [ "ruby", "devEnv" ]
-
-[[packages]]
-load = [ "git",  ]
-
-[[packages]]
-load = [ "sqlite",  ]
-
-[[packages]]
-load = [ "libpcap",  ]
-
-[[packages]]
-load = [ "postgresql",  ]
-
-[[packages]]
-load = [ "libxml2",  ]
-
-[[packages]]
-load = [ "libxslt",  ]
-
-[[packages]]
-load = [ "pkg-config", ]
-
-[[packages]]
-load = [ "bundix",  ]
-
-[[packages]]
-load = [ "gnumake",  ]
-
-[[packages]]
 load = [ "ncurses",]
 
 [[packages]]
@@ -256,9 +233,6 @@ load = [ "nnn",]
 
 [[packages]]
 load = [ "jq",]
-
-[[packages]]
-load = [ "git-subrepo",]
 
 #
 #

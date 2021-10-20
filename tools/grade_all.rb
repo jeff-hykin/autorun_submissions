@@ -14,11 +14,12 @@ end
 # 
 # main vars/paths
 # 
-@setup_file              = "projects"/which_project/"setup.yml"
-@submissions_zip         = "projects"/which_project/"submissions.zip"
-@workspace_folder        = "projects"/which_project/"workspace"
-@output_file             = "projects"/which_project/"results.yml"
-@project_template_folder = "projects"/which_project/"template_code"
+grading_folder = Dir.pwd/"projects"/which_project
+@setup_file              = grading_folder/"setup.yml"
+@submissions_zip         = grading_folder/"submissions.zip"
+@workspace_folder        = grading_folder/"workspace"
+@output_file             = grading_folder/"results.yml"
+@project_template_folder = grading_folder/"template_code"
 setup = YAML.load_file(@setup_file)
 @main_file                    = setup["main_file"]
 @folder_relative_to_main_file = setup["folder_relative_to_main_file"]
@@ -31,17 +32,17 @@ require_relative( Dir.pwd/"projects"/which_project/"grader.rb" )
 # 
 if FS.exists?(@workspace_folder)
     puts "Looks like a workspace folder already exists"
-    puts "Would you like me to clear it out?"
+    print "Would you like me to clear it out? "
     answer = ""
     loop do
-        answer = gets
+        answer = STDIN.gets
         if answer =~ /[yY]/
-            puts "\nOkay"
+            puts "Okay"
             FS.delete(@workspace_folder)
             FS.touch_dir(@workspace_folder)
             break
         elsif answer =~ /[nN]/
-            puts "\nOkay"
+            puts "Okay"
             break
         else
             puts "(please answer with yes or no)"
@@ -84,12 +85,12 @@ index = 0
 for each_zip in submission_zips
     index += 1
     submission_name = FS.basename(each_zip)
+    puts "grading #{index}/#{submission_zips.size}: #{submission_name}"
     submission_folder = output_location/submission_name
     success = Console.run?(["unzip", each_zip, "-d", submission_folder ])
     if not success
         grades[submission_name] = "failed to unzip"
     else
-        puts "grading #{index}/#{submission_zips.size}: #{submission_name}"
         # 
         # combine their code with template code
         # 
