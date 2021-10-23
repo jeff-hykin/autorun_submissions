@@ -1,3 +1,11 @@
+# the one file that the submission MUST have
+@main_file = "multiAgents.py"
+# what is the "main" folder relative to where that file is (often its just the parent folder)
+@folder_relative_to_main_file = ".."
+# what files (from template_code/) should forcefully overwrite files in the submission folder
+@overwrite_submission_files_for_grading = [ "autograder.py", "test_cases" ]
+
+# the function that will be run with each submission
 def grade_assignment(possible_submission_folders, submission_name)
     # (ideally `possible_submission_folders` would only have one iteam but sometimes there are false positives)
     results = []

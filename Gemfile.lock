@@ -1,12 +1,16 @@
 GEM
   remote: http://rubygems.org/
   specs:
+    cmath (1.0.0)
+    mathn (0.1.0)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   bundler
+  cmath
+  mathn
 
 BUNDLED WITH
    2.1.4
