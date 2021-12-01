@@ -783,27 +783,17 @@ require 'open3'
                 HEREDOC
             end
             
-            stderr_text = ""
-            stdout_text = ""
-            combined_text = ""
-            process = nil
-            process_ended = false
             # FIXME: there is a problem with ruby open3: what if the executable name has a space in it and no arguments arg given
             if command.is_a?(String)
                 command = [command]
             end
-            the_thread = nil
+            stderr_text = ""
+            stdout_text = ""
+            combined_text = ""
+            thread_reference = nil
+            process = nil
             Open3.popen3(*command) {|stdin, stdout, stderr, thread|
-                the_thread = thread
-                Thread.new do
-                    begin
-                        Process.wait(the_thread.pid)
-                        process = $?
-                    rescue Errno::ECHILD => exception
-                        process = nil
-                    end
-                    process_ended = true
-                end
+                thread_reference = thread
                 loop do
                     if stdout.ready?
                         stdout_iter = stdout.read
@@ -818,20 +808,20 @@ require 'open3'
                     end
                     
                     if thread.status == false
+                        process = thread.value
                         break
                     end
                 end
             }
-            process_result = Thread.new do 
-                loop do
-                    if process_ended == false && the_thread.status == false
-                        sleep 0.03
-                    else
-                        break
-                    end
+            # wait for command to end
+            loop do
+                if thread_reference && ( ! thread_reference.status)
+                    break
                 end
             end
-            process_result.join # wait for process to be done
+            puts "process is: #{process} "
+            puts "process.exitstatus is: #{process.exitstatus} "
+            puts "process.success? is: #{process.success?} "
             return CommandResult.new(process: process, stdout_text:stdout_text, stderr_text:stderr_text, combined_text: combined_text)
         end
 

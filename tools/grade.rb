@@ -29,17 +29,29 @@ require_relative( Dir.pwd/"projects"/@which_project/"grader.rb" )
 #     @overwrite_submission_files_for_grading
 
 
+# 
+# 
+# tools
+# 
+# 
 
-# 
-# for running
-# 
-run_one_submission = ->(each_zip, index) do
+load_output_file = ->() do
+    # load the file (if it exists)
+    @grades = YAML.load_file(@output_file) rescue {}
+    @grades = {} if not @grades.is_a?(Hash)
+end
+
+run_one_submission = ->(each_zip, progress) do
+    load_output_file[] if @grades == nil
+    
     submission_name = FS.basename(each_zip)
-    puts "grading #{index}/#{submission_zips.size}: #{submission_name}"
-    submission_folder = output_location/submission_name
+    puts "grading #{progress}: #{submission_name}"
+    submission_folder = @folder_for_unzipped_projects/submission_name
+    FS.delete(submission_folder)
     success = Console.run?(["unzip", each_zip, "-d", submission_folder ])
     if not success
-        grades[submission_name] = "failed to unzip"
+        @grades[submission_name] = "failed to unzip"
+        puts "failed to unzip #{each_zip} to #{submission_folder}"
     else
         # 
         # combine their code with template code
@@ -53,63 +65,19 @@ run_one_submission = ->(each_zip, index) do
             template_folder: @project_template_folder,
         )
         if folders.empty?
-            grades[submission_name] = "failed to generate any workspaces, because couldn't find parent folder for: #{@main_file}"
+            @grades[submission_name] = "failed to generate any workspaces, because couldn't find parent folder for: #{@main_file}"
         end
         begin
-            grades[submission_name] = grade_assignment(folders, submission_name)
+            @grades[submission_name] = grade_assignment(folders, submission_name)
         rescue => exception
-            grades[submission_name] = "there was an error when running the grader: #{exception}"
+            @grades[submission_name] = "there was an error when running the grader: #{exception}"
         end
     end
     # save result after every run
-    FS.write(grades.to_yaml, to: @output_file)    
+    FS.write(@grades.to_yaml, to: @output_file)
 end
 
-# 
-# 
-# grade one
-# 
-# 
-if @which_submission.is_a? String
-    submission_path = @folder_for_zipped_submissions/@which_submission
-    unzipped_submission_path = @folder_for_unzipped_projects/@which_submission
-    
-    # 
-    # make sure it exists
-    # 
-    if not FS.file?(submission_path)
-        raise <<~HEREDOC
-            
-            
-            I looked for #{@which_submission}
-            But I didn't see a zip file at #{submission_path}
-        HEREDOC
-    end
-    
-    # 
-    # unzip
-    # 
-    FS.ensure_folder_exists(@folder_for_unzipped_projects)
-    success = Console.run?(["unzip", submission_path, "-d", unzipped_submission_path ])
-    if not success
-        raise <<~HEREDOC
-            
-            
-            Tried to run `unzip` on #{submission_path} to #{unzipped_submission_path} but it failed
-        HEREDOC
-    end
-    
-    #
-    # grade one
-    # 
-    run_one_submission[ unzipped_submission_path, 0 ]
-
-# 
-# 
-# grade all
-# 
-# 
-else
+clear_workspace = ->() do
     # 
     # ask about clearing out workspace
     # 
@@ -132,33 +100,75 @@ else
             end
         end
     end
+end
 
+unzip_main = ->() do
     # 
     # unzip main
     # 
     puts "starting to unzip main"
     FS.ensure_folder_exists(@workspace_folder)
-    success = Console.run?(["unzip", @submissions_zip, "-d", @folder_for_zipped_submissions ])
-    if not success
+    FS.delete(@folder_for_zipped_submissions)
+    result = Console.run!(["unzip", @submissions_zip, "-d", @folder_for_zipped_submissions ])
+    if not result.success?
         raise <<~HEREDOC
             
             
             Tried to run `unzip` on #{@submissions_zip} to #{@folder_for_zipped_submissions} but it failed
+                #{result.text}
         HEREDOC
     else
+        puts result.text
         puts "finished unzipping main"
     end
+end
 
+run_all_submissions = ->() do
     # 
     # unzip + run each
     # 
-    grades = YAML.load_file(@output_file) rescue {}
-    grades = {} if not grades.is_a?(Hash)
     FS.ensure_folder_exists(@folder_for_unzipped_projects)
     submission_zips = FS.glob(@folder_for_zipped_submissions/"*.zip")
     index = 0
     for each_zip in submission_zips
         index += 1
-        run_one_submission[each_zip, index]
+        progress = "#{index}/#{submission_zips.size}"
+        run_one_submission[each_zip, progress]
     end
+end
+
+check_for_zip = ->(submission_path, unzipped_submission_path) do
+    submission_name = FS.basename(submission_path)
+    # 
+    # make sure it exists
+    # 
+    if not FS.file?(submission_path)
+        raise <<~HEREDOC
+            
+            
+            I looked for #{submission_name}
+            But I didn't see a zip file at #{submission_path}
+        HEREDOC
+    end
+end
+
+
+# 
+# 
+# runtime logic
+# 
+# 
+
+# grade one
+if @which_submission.is_a? String
+    unzip_main[]
+    submission_path = @folder_for_zipped_submissions/@which_submission
+    unzipped_submission_path = @folder_for_unzipped_projects/@which_submission
+    check_for_zip[submission_path, unzipped_submission_path]
+    run_one_submission[ unzipped_submission_path, "1/1" ]
+# grade all
+else
+    clear_workspace[]
+    unzip_main[]
+    run_all_submissions[]
 end
