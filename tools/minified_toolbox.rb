@@ -787,6 +787,7 @@ require 'open3'
             if command.is_a?(String)
                 command = [command]
             end
+            stdin_text = keyword_arguments["stdin"] || ""
             stderr_text = ""
             stdout_text = ""
             combined_text = ""
@@ -794,6 +795,8 @@ require 'open3'
             process = nil
             Open3.popen3(*command) {|stdin, stdout, stderr, thread|
                 thread_reference = thread
+                stdin.write(stdin_text)
+                stdin.close
                 loop do
                     if stdout.ready?
                         stdout_iter = stdout.read
@@ -819,9 +822,6 @@ require 'open3'
                     break
                 end
             end
-            puts "process is: #{process} "
-            puts "process.exitstatus is: #{process.exitstatus} "
-            puts "process.success? is: #{process.success?} "
             return CommandResult.new(process: process, stdout_text:stdout_text, stderr_text:stderr_text, combined_text: combined_text)
         end
 
