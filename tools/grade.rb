@@ -167,7 +167,7 @@ if @which_submission.is_a? String
         unzip_main[]
     rescue => exception
         puts exception.to_s
-        Console.ask_yes_no("Continue anyways?")
+        Console.ask_confirm("Continue anyways?")
     end
     submission_path = @folder_for_zipped_submissions/@which_submission
     unzipped_submission_path = @folder_for_unzipped_projects/@which_submission

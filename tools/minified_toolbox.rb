@@ -962,13 +962,13 @@ require 'open3'
         
         def ask_confirm(question)
             puts question + "\n(press Enter to continue CTRL+C to quit)"
-            answer = gets
+            answer = STDIN.gets
         end
         
         def ask_yes_no(question)
             loop do
                 puts question + " (yes/no): "
-                answer = gets
+                answer = STDIN.gets
                 if answer =~ /y/
                     return :yes
                 elsif answer =~ /n/
