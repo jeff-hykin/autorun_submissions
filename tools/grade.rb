@@ -16,11 +16,11 @@ end
 # main vars/paths
 # 
 @grading_folder = Dir.pwd/"projects"/@which_project
-@submissions_zip              = @grading_folder/"submissions.zip"
-@workspace_folder             = @grading_folder/"workspace"
-@output_file                  = @grading_folder/"results.yml"
-@project_template_folder      = @grading_folder/"template_code"
-@folder_for_unzipped_projects = @workspace_folder/"submissions/"
+@submissions_zip               = @grading_folder/"submissions.zip"
+@workspace_folder              = @grading_folder/"workspace"
+@output_file                   = @grading_folder/"results.yml"
+@project_template_folder       = @grading_folder/"template_code"
+@folder_for_unzipped_projects  = @workspace_folder/"submissions/"
 @folder_for_zipped_submissions = @workspace_folder/"zipped_submissions/"
 require_relative( Dir.pwd/"projects"/@which_project/"grader.rb" )
 # we get the below variables from here^
@@ -75,6 +75,8 @@ run_one_submission = ->(each_zip, progress) do
     end
     # save result after every run
     FS.write(@grades.to_yaml, to: @output_file)
+    # save to seperate file after every run
+    FS.write(@grades[submission_name].to_yaml, to: "details"/submission_name)
 end
 
 clear_workspace = ->() do
