@@ -960,6 +960,24 @@ require 'open3'
             end
         end
         
+        def ask_confirm(question)
+            puts question + "\n(press Enter to continue CTRL+C to quit)"
+            answer = gets
+        end
+        
+        def ask_yes_no(question)
+            loop do
+                puts question + " (yes/no): "
+                answer = gets
+                if answer =~ /y/
+                    return :yes
+                elsif answer =~ /n/
+                    return :no
+                else
+                    puts "please answer with yes or no (press CTRL+C to quit)"
+                end
+            end
+        end
     end.new
 
     def log(*args)

@@ -163,7 +163,12 @@ end
 
 # grade one
 if @which_submission.is_a? String
-    unzip_main[]
+    begin
+        unzip_main[]
+    rescue => exception
+        puts exception.to_s
+        Console.ask_yes_no("Continue anyways?")
+    end
     submission_path = @folder_for_zipped_submissions/@which_submission
     unzipped_submission_path = @folder_for_unzipped_projects/@which_submission
     check_for_zip[submission_path, unzipped_submission_path]
