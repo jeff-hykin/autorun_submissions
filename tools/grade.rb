@@ -75,8 +75,10 @@ run_one_submission = ->(each_zip, progress) do
     end
     # save result after every run
     FS.write(@grades.to_yaml, to: @output_file)
+    
+    *path, submission_name_no_extension, extension = FS.path_pieces(submission_name)
     # save to seperate file after every run
-    FS.write(@grades[submission_name].to_yaml, to: "details"/submission_name)
+    FS.write(@grades[submission_name].to_yaml, to: @grading_folder/"details"/submission_name_no_extension+".txt")
 end
 
 clear_workspace = ->() do
