@@ -2,7 +2,7 @@
 # Custom
 # 
 *.zip
-projects/workspace/*
+/projects/*/workspace/*
 
 # 
 # standard
