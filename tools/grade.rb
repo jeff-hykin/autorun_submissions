@@ -174,7 +174,7 @@ if @which_submission.is_a? String
     submission_path = @folder_for_zipped_submissions/@which_submission
     unzipped_submission_path = @folder_for_unzipped_projects/@which_submission
     check_for_zip[submission_path, unzipped_submission_path]
-    run_one_submission[ unzipped_submission_path, "1/1" ]
+    run_one_submission[ submission_path, "1/1" ]
 # grade all
 else
     clear_workspace[]
