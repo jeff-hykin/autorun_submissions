@@ -3,7 +3,7 @@ require_relative "./minified_toolbox.rb"
 def generate_working_spaces(working_spaces_folder:nil, submission_folder:nil, id_path:nil, path_relative_to_id:nil, files_to_overwrite:nil, template_folder:nil)
     working_spaces = []
     if not FS.is_folder(submission_folder)
-        puts "#{submission_folder} is not a folder"
+        puts "Tried generating workspaces using files in #{submission_folder}, but #{submission_folder} is not a folder"
         return working_spaces
     end
     
@@ -54,8 +54,8 @@ def generate_working_spaces(working_spaces_folder:nil, submission_folder:nil, id
             for each_item in files_to_overwrite
                 # delete anything in the way
                 FS.delete(workspace_path/each_item)
-                # link the file to the template
-                File.symlink(template_folder/each_item, workspace_path/each_item) 
+                # copy the file to the template (syslinks can mess with stuff, like screwing up the python path/relative imports)
+                FS.copy(each_item, from: template_folder, to: workspace_path)
             end
             working_spaces.push(workspace_path)
         rescue => exception
